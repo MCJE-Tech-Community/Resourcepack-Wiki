@@ -23,73 +23,89 @@ uniform vec3 Light1_Direction;
 
 out float vertexDistance;
 out vec4 vertexColor;
+out vec4 vertexShadow;
 out vec2 texCoord0;
 out vec2 texCoord1;
 out vec4 normal;
+out vec2 uv0;
 out vec2 t;
 
-void main() {
-    
-    // テクスチャのサイズ取得
-    vec2 size = textureSize(Sampler0, 0);
+int rgb2Int(vec4 color) {
+    return (int(color.r *255) <<16) +(int(color.g *255) <<8) + int(color.b *255);
+}
 
-    // デフォルト
+void main() {
+    // default
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
     vertexDistance = fog_distance(ModelViewMat, Position, FogShape);
     vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color) * texelFetch(Sampler2, UV2 / 16, 0);
-    texCoord0 = UV0 / (size / vec2(64, 32));
+    texCoord0 = UV0;
     texCoord1 = UV1;
     normal = ProjMat * ModelViewMat * vec4(Normal, 0.0);
-    t = vec2(1);
 
-    // スキン範囲のとき
-    int colorID = (int(Color.r *255) <<16) +(int(Color.g *255) <<8) + int(Color.b *255);
-    if (colorID >0 && colorID <20) {
-        // アーマーカラーを消す
-        vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1)) * texelFetch(Sampler2, UV2 / 16, 0);
+    // Additional output
+    vertexShadow = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1)) * texelFetch(Sampler2, UV2 / 16, 0);
+    uv0 = vec2(0);
+    t = vec2(0);
 
-        // id/uv情報
-        int skinID = colorID % 10;
-        int vertex = gl_VertexID % 4;
-        int face = gl_VertexID / 4;
-        vec2 uv = UV0 *vec2(64, 32) +skinID *vec2(64, 32);
-        vec2 delta = ivec2((((gl_VertexID -1) %4) /2 *2 -1), ((gl_VertexID %4) /2 *2 -1)); // 拡大方向を計算
-            if ((UV0.x >= 0.625 && face >= 12 && face < 18) || (UV0.x <= 0.25 && face >= 6 && face < 12)) { delta.y *= -1; } // テクスチャを反転させているところ 左腕と左足
-            if ((face % 6) == 1) { delta.y *= -1; } // テクスチャが回転？しているところ 底面
-        vec2 px = UV0 *vec2(64, 32) -0.5 *delta;
-        vec2 area = vec2(4.0, 12.0); // 面のサイズを取得
-            if (px.y >= 0 && px.y < 16) {
-                area = vec2(8.0, 8.0);
-            }
-            else if (px.y >= 16 && px.y < 64) {
-                if (px.y < 20) {
-                    area.y = 4.0;
-                    if ((px.x >= 20 && px.x < 36)) { area.x = 8.0;}
-                } else {
-                    if ((px.x >= 20 && px.x < 28) || (px.x >= 32 && px.x < 40)) { area.x = 8.0;}
+    // Check color
+    vec2 size = textureSize(Sampler0, 0); // Get texture size.
+    int gCorner = rgb2Int(texture(Sampler0, vec2(0,0))); // Global corner
+    // When leather_layer_1
+    if (gCorner == 16777215) {
+        // Fix UV coordinates.
+        int colorID = rgb2Int(Color);
+        int skinID = colorID % 10; // Now, miximum is 10.
+        int vertexID = gl_VertexID % 4;
+        int faceID = gl_VertexID / 4;
+        vec2 d = ivec2((((gl_VertexID -1) %4) /2 *2 -1), ((gl_VertexID %4) /2 *2 -1)); // Direction for expand.
+        
+        uv0 = UV0 *vec2(64, 32); // Local pixel coordinates.
+        texCoord0 = UV0 *vec2(64, 32) /size;
+
+        // When colorID is in range.
+        if (colorID >0 && colorID <20) {
+            // Send vertexColor excluding tintindex color.
+            vertexColor = vertexShadow;
+
+            // Get some parameters.
+            if ((uv0.x >= 40 && faceID >= 12 && faceID < 18) || (uv0.x <= 16 && faceID >= 6 && faceID < 12)) { d.y *= -1; } // Where uv fliped.
+            if ((faceID % 6) == 1) { d.y *= -1; } // Also where uv fliped (bottom of cube).
+            uv0 -= 0.5 *d; // px center pos.
+            vec2 area = vec2(4.0, 12.0); // XY size of face.
+                if (uv0.y >= 0 && uv0.y < 16) { // Head.
+                    area = vec2(8.0, 8.0);
                 }
+                else if (uv0.y >= 16 && uv0.y < 64) { // Body and Legs.
+                    if (uv0.y < 20) { // Top and bottom face.
+                        area.y = 4.0;
+                        if ((uv0.x >= 20 && uv0.x < 36)) { area.x = 8.0;} // Body top and bottom face.
+                    } else {
+                        if ((uv0.x >= 20 && uv0.x < 28) || (uv0.x >= 32 && uv0.x < 40)) { area.x = 8.0;} // Body front and back face.
+                    }
+                }
+
+            // Resize constant.
+            float a = 0.055;
+            float b = 0.90;
+            if (colorID > 10) { // For armor_stand, zombie and skeleton.
+                a *= 1.1;
+                b *= 1.04;
+            }
+            if (uv0.x < 16 && uv0.y >= 16) { // Boots
+                a *= 0.85;
+                b *= 0.83;
+                if (((faceID %6 == 5) && (vertexID == 0 || vertexID == 3) )) { a -= 0.002; } // Back face of boots. (I don't know why, but it's distorted.)
+            }
+            if (abs(ProjMat[3][3] - 1.0) < 0.01) { // Inventory
+                a *= 20;
             }
 
-        // パーツによって係数を変更
-        float a = 0.055;
-        float b = 0.90;
-        if (colorID > 10) { // サイズ
-            a *= 1.1;
-            b *= 1.04;
+            // Shrink model
+            gl_Position = ProjMat * ModelViewMat * vec4(Position - Normal*a, 1.0); // 1. Move faces in a perpendicular direction to fit the surface and the body.
+            texCoord0 = (uv0 +skinID *vec2(64, 32) +d *b) /size; // 2. Expand UV coordinates to match texture.
+            t = d + (d *b *2 /area); // 3. Remove the overhang with a fragment shader.
         }
-        if (px.x < 16 && px.y >= 16) { // ブーツ
-            a *= 0.85;
-            b *= 0.83;
-            if (((face %6 == 5) && (vertex == 0 || vertex == 3) )) { a -= 0.002; } // なぜかブーツの一部が窪んでるので
-        }
-        if (abs(ProjMat[3][3] - 1.0) < 0.01) { // インベントリ内かどうか
-            a *= 20;
-        }
-
-        // モデルの形状を変更させる
-        gl_Position = ProjMat * ModelViewMat * vec4(Position - Normal*a, 1.0); // 垂線方向に移動させて面を体にくっつける
-        texCoord0 = (uv +delta *b) /size; // テクスチャの範囲を広げ、相対的に範囲内にテクスチャが来るようにする
-        t = delta + (delta *b *2 /area); // フラグメントシェーダーに情報を与える 残したい範囲が-1~1になるように計算
     }
 }
