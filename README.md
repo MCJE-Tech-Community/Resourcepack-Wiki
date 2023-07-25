@@ -19,7 +19,7 @@ github wikiに、ここで掲載している物も含めいろいろと技術的
 
 ## スキンオーバーレイ
 
-
+<img src="https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/blob/main/04_Shader/skin_overlay/skin_overlay.gif" height="250px"></img>  
 ▲動作の様子  
 
 ### 説明
@@ -35,7 +35,7 @@ github wikiに、ここで掲載している物も含めいろいろと技術的
 
 ## ブロック透視コアシェーダー
 
-
+<img src="https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/blob/main/04_Shader/seeing_through/seeing_through.gif" height="250px"></img>  
 ▲動作の様子  
 
 ### 説明
