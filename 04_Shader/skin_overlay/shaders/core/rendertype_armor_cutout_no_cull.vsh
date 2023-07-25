@@ -62,7 +62,7 @@ void main() {
         vec2 d = ivec2((((gl_VertexID -1) %4) /2 *2 -1), ((gl_VertexID %4) /2 *2 -1)); // Direction for expand.
         
         uv0 = UV0 *vec2(64, 32); // Local pixel coordinates.
-        texCoord0 = UV0 *vec2(64, 32) /size;
+        texCoord0 = uv0 /size;
 
         // When colorID is in range.
         if (colorID >0 && colorID <20) {
@@ -72,17 +72,17 @@ void main() {
             // Get some parameters.
             if ((uv0.x >= 40 && faceID >= 12 && faceID < 18) || (uv0.x <= 16 && faceID >= 6 && faceID < 12)) { d.y *= -1; } // Where uv fliped.
             if ((faceID % 6) == 1) { d.y *= -1; } // Also where uv fliped (bottom of cube).
-            uv0 -= 0.5 *d; // px center pos.
+            vec2 _uv0 = uv0 - 0.5 *d; // px center pos.
             vec2 area = vec2(4.0, 12.0); // XY size of face.
-                if (uv0.y >= 0 && uv0.y < 16) { // Head.
+                if (_uv0.y >= 0 && _uv0.y < 16) { // Head.
                     area = vec2(8.0, 8.0);
                 }
-                else if (uv0.y >= 16 && uv0.y < 64) { // Body and Legs.
-                    if (uv0.y < 20) { // Top and bottom face.
+                else if (_uv0.y >= 16 && _uv0.y < 64) { // Body and Legs.
+                    if (_uv0.y < 20) { // Top and bottom face.
                         area.y = 4.0;
-                        if ((uv0.x >= 20 && uv0.x < 36)) { area.x = 8.0;} // Body top and bottom face.
+                        if ((_uv0.x >= 20 && _uv0.x < 36)) { area.x = 8.0;} // Body top and bottom face.
                     } else {
-                        if ((uv0.x >= 20 && uv0.x < 28) || (uv0.x >= 32 && uv0.x < 40)) { area.x = 8.0;} // Body front and back face.
+                        if ((_uv0.x >= 20 && _uv0.x < 28) || (_uv0.x >= 32 && _uv0.x < 40)) { area.x = 8.0;} // Body front and back face.
                     }
                 }
 
@@ -93,7 +93,7 @@ void main() {
                 a *= 1.1;
                 b *= 1.04;
             }
-            if (uv0.x < 16 && uv0.y >= 16) { // Boots
+            if (_uv0.x < 16 && _uv0.y >= 16) { // Boots
                 a *= 0.85;
                 b *= 0.83;
                 if (((faceID %6 == 5) && (vertexID == 0 || vertexID == 3) )) { a -= 0.002; } // Back face of boots. (I don't know why, but it's distorted.)
@@ -104,7 +104,7 @@ void main() {
 
             // Shrink model
             gl_Position = ProjMat * ModelViewMat * vec4(Position - Normal*a, 1.0); // 1. Move faces in a perpendicular direction to fit the surface and the body.
-            texCoord0 = (uv0 +skinID *vec2(64, 32) +d *b) /size; // 2. Expand UV coordinates to match texture.
+            texCoord0 = (uv0 +skinID *vec2(0, 32) +d *b) /size; // 2. Expand UV coordinates to match texture.
             t = d + (d *b *2 /area); // 3. Remove the overhang with a fragment shader.
         }
     }
