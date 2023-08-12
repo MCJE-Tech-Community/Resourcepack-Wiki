@@ -4,7 +4,7 @@ Minecraftのテクスチャ、カスタムモデル、カスタムシェーダ�
 
 <!-- omit in toc -->
 # 解説Wiki
-### [技術解説wiki](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki)
+### [技術解説wiki](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/wiki)
 github wikiに、ここで掲載している物も含めいろいろと技術的な解説を載せています。(予定)  
 
 <!-- omit in toc -->
