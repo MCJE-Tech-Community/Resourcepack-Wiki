@@ -1,6 +1,6 @@
 <!-- omit in toc -->
 # Minecraft JE Resourcepack Wiki
-Minecraftのテクスチャ、カスタムモデル、カスタムシェーダーについてのネタを集めたwikiです。
+Minecraftのテクスチャ、カスタムモデル、カスタムシェーダーなどリソースパックについてのネタを集めたwikiです。
 
 <!-- omit in toc -->
 # 解説Wiki
