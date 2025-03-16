@@ -74,7 +74,7 @@ void main() {
         // When colorID is in range.
         if (colorID >0 && colorID <20) {
 
-            vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1)) * texelFetch(Sampler2, UV2 / 16, 0);
+            vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1));
 
             // Get some parameters.
                 // Flip direction
