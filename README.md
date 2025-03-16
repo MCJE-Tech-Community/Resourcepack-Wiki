@@ -26,7 +26,7 @@ github wikiに、ここで掲載している物も含めいろいろと技術的
 　特定の色を付けた皮防具に特定のスキンを反映させ、着せた対象のスキンをオーバーレイさせられるシェーダー。コアシェーダーでアーマーのモデルを縮めることで体にぴったりとくっつけている。
 
 ### 使い方
-　[`skin_overlay`](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/tree/main/04_Shader/skin_overlay)下にある`shaders`と`textures`を`data/`下に入れ、リソースパックをリロード。下記のようなコマンドで色付きの皮防具を取得。
+　[`skin_overlay`](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/tree/main/04_Shader/skin_overlay)下にある`shaders`と`textures`を`assets/`下に入れ、リソースパックをリロード。下記のようなコマンドで色付きの皮防具を取得。
 ```
 /give @s leather_helmet{display:{color:1}}
 ```
@@ -44,6 +44,6 @@ github wikiに、ここで掲載している物も含めいろいろと技術的
 　暗視エフェクトを付けると周囲のブロックが透け、向こう側が見えるようになるコアシェーダー。
 
 ### 使い方
-　[`seeing_through`](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/tree/main/04_Shader/seeing_through)下にある`core`と`include`を`data/`下に入れ、リソースパックをリロード。暗視エフェクトを付けると透視が発動する。
+　[`seeing_through`](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/tree/main/04_Shader/seeing_through)下にある`core`と`include`を`assets/`下に入れ、リソースパックをリロード。暗視エフェクトを付けると透視が発動する。
 
 (2023/07/26)
