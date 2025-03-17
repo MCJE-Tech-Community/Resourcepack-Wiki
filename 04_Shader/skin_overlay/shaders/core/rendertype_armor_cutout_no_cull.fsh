@@ -10,7 +10,8 @@ uniform float FogEnd;
 uniform vec4 FogColor;
 
 in float vertexDistance;
-in vec4 vertexColor;
+in vec4 vertexColor1;
+in vec4 vertexColor2;
 in vec4 lightMapColor;
 in vec4 overlayColor;
 in vec2 texCoord0;
@@ -30,17 +31,18 @@ void main() {
 
     // Reproduce overlay of leather armor.
     if ((uv0.x >= 11 && uv0.x < 13 && uv0.y >= 0 && uv0.y < 11) || (uv0.x >= 27 && uv0.x < 29 && uv0.y >= 8 && uv0.y < 15) || (uv0.x >= 8 && uv0.x < 12 && uv0.y >= 16 && uv0.y < 20)) {
-        #ifndef EMISSIVE
-            color *= lightMapColor;
-        #endif
+        color *= vertexColor2 * ColorModulator;
+    } else {
+        color *= vertexColor1 * ColorModulator;
     }
+
     // Cutout extra pixels.
     if (t.x < -1 || t.x > 1 || t.y < -1 || t.y > 1) {
         discard;
     }
 
     // default
-    color *= vertexColor * ColorModulator;
+
 #ifndef NO_OVERLAY
     color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
 #endif

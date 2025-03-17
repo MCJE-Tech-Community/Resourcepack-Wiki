@@ -23,7 +23,8 @@ uniform vec3 Light0_Direction;
 uniform vec3 Light1_Direction;
 
 out float vertexDistance;
-out vec4 vertexColor;
+out vec4 vertexColor1;
+out vec4 vertexColor2;
 out vec4 lightMapColor;
 out vec4 overlayColor;
 out vec2 texCoord0;
@@ -42,7 +43,8 @@ void main() {
 #ifdef NO_CARDINAL_LIGHTING
     vertexColor = Color;
 #else
-    vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color);
+    vertexColor1 = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, Color);
+    vertexColor2 = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1));
 #endif
     lightMapColor = texelFetch(Sampler2, UV2 / 16, 0);
     overlayColor = texelFetch(Sampler1, UV1, 0);
@@ -65,7 +67,7 @@ void main() {
         int colorID = rgb2Int(Color);
         int skinID = colorID % 10; // Now, miximum is 10.
         int vertexID = gl_VertexID % 4;
-        int faceID = gl_VertexID / 4; // 0~5:head,right_arm,left_leg, 6~11:left_arm,right_leg, 12~17:body
+        int faceID = gl_VertexID / 4; // 0~5:head,right_arm,left_leg, 6~11:cap,left_arm,right_leg, 12~17:body
         vec2 d = ivec2((((gl_VertexID -1) %4) /2 *2 -1), ((gl_VertexID %4) /2 *2 -1)); // Direction for expand.
         
         uv0 = UV0 *vec2(64, 32); // Local pixel coordinates.
@@ -74,11 +76,12 @@ void main() {
         // When colorID is in range.
         if (colorID >0 && colorID <20) {
 
-            vertexColor = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1));
+            vertexColor1 = minecraft_mix_light(Light0_Direction, Light1_Direction, Normal, vec4(1));
 
             // Get some parameters.
                 // Flip direction
-                if ((faceID >= 6 && faceID < 12)) { d.y *= -1; } // Where uv fliped.
+                if ((faceID >= 6 && faceID < 8 && uv0.y >= 16)) { d.y *= -1; } // Where uv fliped (leg & arm).
+                if ((faceID >= 8 && faceID < 12 && uv0.y >= 20)) { d.y *= -1; } // Where uv fliped (leg & arm).
                 if ((faceID % 6) == 1) { d.y *= -1; } // Also where uv fliped (bottom of cube).
                 if ((uv0.x <= 16 && uv0.y >= 20) && ((faceID >= 2 && faceID < 6) || (faceID >= 8 && faceID < 12))) { d.y *= -1;} 
                 if ((uv0.x >= 4 && uv0.x <= 12 && uv0.y >= 16 && uv0.y <= 20) && ((faceID >= 0 && faceID < 2) || (faceID >= 6 && faceID < 8))) { d.y *= -1;} // All face of legs.
