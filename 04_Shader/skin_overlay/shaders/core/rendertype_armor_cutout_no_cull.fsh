@@ -14,7 +14,6 @@ in vec4 vertexColor;
 in vec4 vertexShadow;
 in vec2 texCoord0;
 in vec2 texCoord1;
-in vec4 normal;
 in vec2 uv0;
 in vec2 t;
 
