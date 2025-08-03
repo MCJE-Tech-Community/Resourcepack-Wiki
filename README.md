@@ -28,7 +28,7 @@ github wikiに、ここで掲載している物も含めいろいろと技術的
 ### 使い方
 　[`skin_overlay`](https://github.com/MCJE-Tech-Shares/Resourcepack-Wiki/tree/main/04_Shader/skin_overlay)下にある`shaders`と`textures`を`assets/`下に入れ、リソースパックをリロード。下記のようなコマンドで色付きの皮防具を取得。
 ```
-/give @s leather_helmet{display:{color:1}}
+/give @s leather_helmet[minecraft:dyed_color=1]
 ```
 
 `color`の部分を1~10と変えると、`textures/leather_layer_1.png`に追加されているスキンが上から順番に表示される。スキンを変更したい場合は、`textures/leather_layer_1.png`の対象スキンを変更すればよい。
